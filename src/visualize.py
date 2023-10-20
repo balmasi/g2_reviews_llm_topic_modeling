@@ -5,7 +5,7 @@ import plotly.express as px
 
 
 
-def visualize_embeddings(df, x_col, y_col, cluster_column, review_text_column, colour_by_column):
+def visualize_embeddings(df, x_col, y_col, review_text_column, colour_by_column):
     # Create the interactive plot
     fig = px.scatter(
         df,
@@ -15,13 +15,12 @@ def visualize_embeddings(df, x_col, y_col, cluster_column, review_text_column, c
         hover_data={
             x_col: False,  # hide the x-coordinate
             y_col: False,  # hide the y-coordinate
-            cluster_column: False,  # hide the cluster_column
             review_text_column: True  # display the hover_text
         }
     )
 
     fig.update_layout(
-        legend_title_text='Clusters'
+        legend_title_text=None
         # , height=1300
     )
 
@@ -55,5 +54,6 @@ def plot_over_time(df, date_col):
     )
 
     # Create a bar chart with Plotly
-    fig = px.bar(daily_counts, x=date_col, y='count', title='Number of Items Published Over Time')
+    fig = px.bar(daily_counts, x=date_col, y='count')
+    fig.update_yaxes(title='', showgrid=False, zeroline=False, showticklabels=False)
     return fig

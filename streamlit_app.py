@@ -1,5 +1,3 @@
-import asyncio
-from os import environ
 from src.extract_topic import summarize_parallel, summarize_sequential
 
 import streamlit as st
@@ -116,18 +114,21 @@ reduce_dim_df = reduce_dimensions_append_x_y(clustered_df, f'{REVIEW_COL}_embedd
 
 
 #### FILTERS
-
-# Review Source 
+#  
 filtered_df = radio_filter('Source', sb, reduce_dim_df, 'Review Source')
 filtered_df = radio_filter('Segment', sb, filtered_df, 'Reviewer Type')
 filtered_df = range_filter('Review Date', sb, filtered_df, 'Published date')
 
+### Colour Selector
+colour_by_selected = st.radio('Colour by', options=['Cluster', 'Segment', 'Source'], index=0, horizontal=True)
+colour_by_col = {'Segment': 'Reviewer Type', 'Source': 'Review Source', 'Cluster': 'cluster_label'}[colour_by_selected]
+
+
 fig_clusters = visualize_embeddings(
     filtered_df,
     x_col='x', y_col='y',
-    cluster_column='cluster_label',
     review_text_column=REVIEW_COL,
-    colour_by_column='cluster_label'
+    colour_by_column=colour_by_col
 )
 
 
