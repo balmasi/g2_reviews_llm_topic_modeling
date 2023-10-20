@@ -1,5 +1,9 @@
 # Embedding Support
+
+import umap
 import pandas as pd
+import numpy as np
+import streamlit as st
 
 from src.constants import OPENAI_KEY
 # from langchain.embeddings import OpenAIEmbeddings
@@ -11,7 +15,6 @@ from sentence_transformers import SentenceTransformer
 #     # Generate embeddings for the text column
 #     return embedder.embed_documents(na_filled.tolist())
 
-import streamlit as st
 
 def generate_embeddings_free(txt_series):
     embedder = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
@@ -24,4 +27,18 @@ def generate_embeddings_free(txt_series):
 def embed_reviews(df, column):
     df[f'{column}_embeddings'] = pd.Series(list(generate_embeddings_free(df[column])))
    
+    return df
+
+@st.cache_data(show_spinner=False)
+def reduce_dimensions_append_x_y(df, vector_col):
+    df = df.copy()
+    
+    # Extract embeddings, cluster labels, and hover text from DataFrame
+    embeddings = np.array(df[vector_col].tolist())
+    # Apply UMAP
+    reducer = umap.UMAP(random_state=42)
+    embeddings_2d = reducer.fit_transform(embeddings)
+    df['x'] = embeddings_2d[:, 0]
+    df['y'] = embeddings_2d[:, 1]
+
     return df

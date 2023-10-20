@@ -4,40 +4,32 @@ import pandas as pd
 import plotly.express as px
 
 
-def visualize_embeddings(df, embeddings_column, cluster_column, review_text_column, colour_by_column):
-    # Extract embeddings, cluster labels, and hover text from DataFrame
-    embeddings = np.array(df[embeddings_column].tolist())
-    cluster_labels = df[cluster_column].astype(str)
-    review_text = df[review_text_column]
 
-    # Apply UMAP
-    reducer = umap.UMAP(random_state=42)
-    embeddings_2d = reducer.fit_transform(embeddings)
-
-    # Create a new DataFrame for the 2D embeddings
-    df_2d = pd.DataFrame(embeddings_2d, columns=['x', 'y'])
-    df_2d[cluster_column] = cluster_labels  # Ensure that the cluster labels are treated as categorical data
-    df_2d['review_text'] = review_text
-    df_2d[colour_by_column] = df[colour_by_column].astype(str)
-
+def visualize_embeddings(df, x_col, y_col, cluster_column, review_text_column, colour_by_column):
     # Create the interactive plot
-    fig = px.scatter(df_2d, x='x', y='y', color=colour_by_column,
-                     hover_data={
-                         'x': False,  # hide the x-coordinate
-                         'y': False,  # hide the y-coordinate
-                         cluster_column: False,  # hide the cluster_column
-                         'review_text': True  # display the hover_text
-                     },
-                     title=f'Reviews coloured by {colour_by_column}'
+    fig = px.scatter(
+        df,
+        x=x_col,
+        y=y_col,
+        color=colour_by_column,
+        hover_data={
+            x_col: False,  # hide the x-coordinate
+            y_col: False,  # hide the y-coordinate
+            cluster_column: False,  # hide the cluster_column
+            review_text_column: True  # display the hover_text
+        }
     )
 
-    fig.update_layout(legend_title_text='Clusters')
+    fig.update_layout(
+        legend_title_text='Clusters'
+        # , height=1300
+    )
 
     # Customize the layout
-    fig.update_traces(marker=dict(size=5,
-                                  line=dict(width=2,
-                                            color='DarkSlateGrey')),
-                      selector=dict(mode='markers+text'))
+    fig.update_traces(
+        marker=dict(size=5, line=dict(width=2, color='DarkSlateGrey')),
+        selector=dict(mode='markers+text')
+    )
 
     # Hide cluster id -1 by default (noise)
     for trace in fig.data:
@@ -49,4 +41,19 @@ def visualize_embeddings(df, embeddings_column, cluster_column, review_text_colu
     fig.update_yaxes(title='', showgrid=False, zeroline=False, showticklabels=False)
 
     # Show the plot
+    return fig
+
+
+def plot_over_time(df, date_col):
+    daily_counts = (
+        pd.to_datetime(df[date_col])
+        .dt.floor('D')
+        .to_frame()
+        .groupby(date_col)
+        .size()
+        .reset_index(name='count')
+    )
+
+    # Create a bar chart with Plotly
+    fig = px.bar(daily_counts, x=date_col, y='count', title='Number of Items Published Over Time')
     return fig

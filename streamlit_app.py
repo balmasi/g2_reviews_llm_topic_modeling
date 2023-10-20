@@ -6,9 +6,10 @@ import streamlit as st
 import pandas as pd
 
 from src.text_utils import split_into_sentences
-from src.embeddings import embed_reviews
+from src.embeddings import embed_reviews, reduce_dimensions_append_x_y
 from src.cluster import cluster_and_append, find_closest_to_centroid
-from src.visualize import visualize_embeddings
+from src.visualize import visualize_embeddings, plot_over_time
+from src.ui import radio_filter, range_filter
 
 
 REVIEW_COL = 'review_text'
@@ -24,6 +25,8 @@ def extract_answers(df_original):
     df['like_best'] = df['Review body'].str.extract(regex_like_best, expand=False)
     df['dislike'] = df['Review body'].str.extract(regex_dislike, expand=False)
     df['problems_solving'] = df['Review body'].str.extract(regex_problems_solving, expand=False)
+    df['Published date'] = df['Published date'].dt.date.astype(str)
+    df['Original date'] = df['Original date'].dt.date.astype(str)
 
     return df
 
@@ -49,7 +52,7 @@ def select_reviews_of_type(df, review_type):
         raise ValueError('Unexpected review type')
 
 
-df_reviews = pd.read_csv('./data/g2.csv')
+df_reviews = pd.read_csv('./data/g2.csv', parse_dates=['Published date', 'Original date'])
 df_cleaned = extract_answers(df_reviews)
 base_df = df_cleaned[['ID', 'Name', 'Review slug', 'Company name', 'Competitor type',
        'Review rating', 'Review Link', 'Reviewer Type', 'Reviewer Title',
@@ -126,14 +129,29 @@ top_cluster_docs = summarize_sequential(top_cluster_docs)
 top_cluster_map = {cluster_id: data["cluster_label"] for cluster_id, data in top_cluster_docs.items()}
 clustered_df['cluster_label'] = clustered_df[f'{REVIEW_COL}_embeddings_cluster_id'].map(top_cluster_map)
 
+## Reduce the embedding space to 2D
+reduce_dim_df = reduce_dimensions_append_x_y(clustered_df, f'{REVIEW_COL}_embeddings')
 
-fig = visualize_embeddings(
-    clustered_df,
-    embeddings_column=f'{REVIEW_COL}_embeddings',
-    cluster_column=f'{REVIEW_COL}_embeddings_cluster_id',
+
+#### FILTERS
+
+# Review Source 
+filtered_df = radio_filter('Source', sb, reduce_dim_df, 'Review Source')
+filtered_df = radio_filter('Segment', sb, filtered_df, 'Reviewer Type')
+filtered_df = range_filter('Review Date', sb, filtered_df, 'Published date')
+
+fig_clusters = visualize_embeddings(
+    filtered_df,
+    x_col='x', y_col='y',
+    cluster_column='cluster_label',
     review_text_column=REVIEW_COL,
     colour_by_column='cluster_label'
 )
 
-st.plotly_chart(fig, use_container_width=True)
 
+st.plotly_chart(fig_clusters, use_container_width=True)
+
+
+fig_publish_dates = plot_over_time(filtered_df, 'Published date')
+
+st.plotly_chart(fig_publish_dates, use_container_width=True)
