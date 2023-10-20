@@ -95,24 +95,6 @@ company_df = base_df[base_df['Company name'] == selected_company].merge(
 with st.spinner('Clustering Reviews...'):
     clustered_df = cluster_and_append(company_df, f'{REVIEW_COL}_embeddings')
 
-# #Define the two columns
-# col1, col2 = st.columns(2)
-
-# # Get the input from the user
-# rating_min = col1.number_input('Rating Min', min_value=1, max_value=10, value=1)
-# rating_max = col2.number_input('Rating Max', min_value=1, max_value=10, value=10)
-
-# # Validate the input
-# if rating_min > rating_max:
-#     st.error('The minimum rating should not be higher than the maximum rating.')
-# elif rating_max < rating_min:
-#     st.error('The maximum rating should not be lower than the minimum rating.')
-             
-# # # Filter the DataFrame based on selected ratings
-# filtered_df = clustered_df[
-#     (clustered_df['Review rating']>= rating_min) & (clustered_df['Review rating']<= rating_max)
-# ]
-
 N = 30
 
 top_cluster_docs = find_closest_to_centroid(
