@@ -96,9 +96,11 @@ def summarize_sequential(top_n_cluster):
         
         progress = (i + 1) / num_clusters
         progress_bar.progress(progress)
-        progress_text.text(f'Processing document {i + 1}/{num_clusters}')
+        progress_text.text(f'Naming cluster {i + 1}/{num_clusters}')
 
     # Ensure the progress bar is full upon completion
-    progress_bar.progress(1.0)
+    progress_bar.empty()
+    progress_text.empty()
+
 
     return top_n_cluster
