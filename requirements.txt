@@ -1,7 +1,6 @@
 streamlit
 python-dotenv
 spacy
-https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.7.2/en_core_web_trf-3.7.2.tar.gz
 langchain
 openai
 pandas 
@@ -11,3 +10,4 @@ scikit-learn
 hdbscan
 plotly
 tqdm
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.0/en_core_web_sm-3.7.0.tar.gz
