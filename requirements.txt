@@ -2,7 +2,7 @@ streamlit
 python-dotenv
 spacy
 langchain
-openai
+openai==v0.28.1
 pandas 
 sentence-transformers
 umap-learn
