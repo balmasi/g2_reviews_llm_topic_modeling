@@ -6,7 +6,7 @@ import streamlit as st
 
 def cluster_column_embeddings(column_embeddings):
     # Initialize HDBSCAN with minimum cluster size
-    clusterer = hdbscan.HDBSCAN(min_cluster_size=5, min_samples=3, cluster_selection_epsilon=0.5) #gen_min_span_tree=True)
+    clusterer = hdbscan.HDBSCAN(min_cluster_size=5, min_samples=3, cluster_selection_epsilon=0.5)
     
     # Fit the HDBSCAN clusterer
     clusterer.fit(column_embeddings)
@@ -15,7 +15,7 @@ def cluster_column_embeddings(column_embeddings):
 
 def cluster_column_embeddings_umap(column_embeddings):
     # Reduce dimensions with UMAP
-    umap_model = umap.UMAP(n_components=10, random_state=42)
+    umap_model = umap.UMAP(n_components=10)
     umap_embeddings = umap_model.fit_transform(column_embeddings)
     
     # Initialize HDBSCAN with adjusted parameters

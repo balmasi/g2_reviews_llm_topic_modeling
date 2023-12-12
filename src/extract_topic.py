@@ -2,30 +2,35 @@ import textwrap
 import asyncio
 
 import streamlit as st
-from langchain.chat_models import ChatOpenAI
-from langchain import OpenAI, PromptTemplate, LLMChain
+
+from langchain.llms import OpenAI
+from langchain.prompts import PromptTemplate
+from langchain.chains import LLMChain
 from langchain.globals import set_llm_cache
 from langchain.cache import SQLiteCache
+from langchain.chat_models import ChatOpenAI
+from langchain.prompts import ChatPromptTemplate
+from langchain.schema.output_parser import StrOutputParser
 
 from src.constants import OPENAI_KEY
 
 set_llm_cache(SQLiteCache(database_path=".langchain.db"))
 
-llm3 = OpenAI(
+llm3 = ChatOpenAI(
     temperature=0, 
     openai_api_key=OPENAI_KEY,
-    model='gpt-3.5-turbo-instruct',
+    model='gpt-3.5-turbo-1106',
     cache=True,
-    max_tokens=100
+    max_tokens=500
 
 )
 
-llm4 = OpenAI(
+llm4 = ChatOpenAI(
     temperature=0, 
     openai_api_key=OPENAI_KEY,
-    model='gpt-4',
+    model='gpt-4-1106-preview',
     cache=True,
-    max_tokens=100
+    max_tokens=500
 
 )
 
@@ -36,25 +41,52 @@ def summarize_cluster(texts, _llm):
 
     summarize_one_prompt = textwrap.dedent(
         '''
-        You are an expert summarizer with the ability to summarize a set of documents into a single concise label.
-        Provide at most 3 labels that encapsulate the topics all documents have in common. The documents are enclosed in triple backticks (```).
-        The label(s) you provide should not be longer than a few words. Do not include anything else.
+        You are an expert summarizer with the ability to find patterns in a set of customer reviews and summarize them into a single concise label.
+        Provide a single short (3-10 words) label that encapsulate the key points the reviews have in common.
+        The label(s) you provide should not be longer than a few words.
+        Ensure the label generated is not too vague (e.g. Do not include anything else.
 
-        DOCUMENTS:
-        ```{review_text}```
+        The reviews are enclosed in triple backticks (```).
+
+        ---
+        EXAMPLE 1
+
+        REVIEWS:
+        ```
+        Review 1: The UI seems to be a little buggy and slow to respond, but it's been getting better
+        Review 2: I think they could use more integrations. The user interface also could use some love. It's finicky and and confusing.
+        Review 3: The app user experience needs to be improved. It's extremely hard to use.
+        ```
+
+        LABEL: UI is hard to use
+
+        ---
+        EXAMPLE 2
+
+        REVIEWS:
+        ```
+        Review 1: The initial price point is pretty high.
+        Review 2: Licensing can be a pain in the neck.
+        Review 3: Pricing can be lower to favor lower market segments.
+        Review 4: The pricing model needs to be simplified.
+        ```
+
+        LABEL: Expensive and Confusing Pricing Model
+        ---
+
+        REVIEWS:
+        ```
+        {review_text}
+        ```
 
         LABEL:
         ''')
-    summarize_one_prompt_template = PromptTemplate(template=summarize_one_prompt, input_variables=["review_text"])
-    summarize_one_chain = LLMChain(
-        llm=_llm,
-        prompt=summarize_one_prompt_template
-    )
+    prompt = ChatPromptTemplate.from_template(summarize_one_prompt)
+    stuffed_reviews_txt = '\n\n'.join([f'Review {i}: {txt}' for i, txt in enumerate(texts)])
 
-    stuffed_reviews_txt = '\n'.join([f'Review {i}: {txt}' for i, txt in enumerate(texts)])
+    chain = prompt | llm3 | StrOutputParser()
     
-    # Assuming summarize_one_chain.run() is an async function
-    return summarize_one_chain.run(stuffed_reviews_txt)
+    return chain.invoke({ "review_text": stuffed_reviews_txt })
 
 
 @st.cache_resource
@@ -77,6 +109,7 @@ async def summarize_parallel(top_n_cluster):
     top_n_cluster[-1]['cluster_label'] = 'Uncategorized'
 
     return top_n_cluster
+
 
 def summarize_sequential(top_n_cluster):
     """

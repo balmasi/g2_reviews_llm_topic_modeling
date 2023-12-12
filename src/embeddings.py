@@ -5,15 +5,7 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 
-from src.constants import OPENAI_KEY
-# from langchain.embeddings import OpenAIEmbeddings
 from sentence_transformers import SentenceTransformer
-
-# def generate_embeddings_openai(txt_series):
-#     embedder = OpenAIEmbeddings(openai_api_key=OPENAI_KEY)
-#     na_filled = txt_series.fillna("", inplace=False) 
-#     # Generate embeddings for the text column
-#     return embedder.embed_documents(na_filled.tolist())
 
 
 def generate_embeddings_free(txt_series):
