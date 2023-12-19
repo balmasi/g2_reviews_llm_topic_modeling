@@ -4,21 +4,44 @@ This project is a proof-of-concept demonstraing how you can use LLMs to perform 
 
 In this scenario, we're taking G2 reviews and performing topic modelling in a simple streamlit app.
 
+The overall (processing) pipeline is as follows:
+1. Get the G2 company reviews for your target companies (manual step, instructions below) 
+2. Basic data reshaping from resulting json (`preprocess.py`)
+3. Split reviews into sentences
+4. Embed sentences
+5. Reduce dimensionality (slightly) and cluster sentences
+6. Find N points close to the center of each cluster and stuff them in the LLM to extract the topics
+7. Reduce dimensions to 2D in order to visualize
+
 ## Getting Started
 
 ### Prerequisites
 
-Python (version 3.10)
+
+##### Rename `.env.example` to  `.env`.
+- Setting the `OPENAI_API_KEY` is mandatory
+- If you want to fetch a new set of companies you need to set `APIFY_API_TOKEN`, otherwise, it will use the sample G2 reviews in the repo.
+
 
 
 ### Installation
 
-1. Clone the repository:
-
-   ```bash
+#### 1. Clone the repository:
+```bash
    git clone https://github.com/balmasi/topic_modeling_llm
+```
 
-2. Install the required dependencies:
+
+#### 2. Create a virtual environment
+The easiest way to do this is to use [Conda](https://conda.io/projects/conda/en/latest/user-guide/install/index.html).
+```bash
+# Create the g2_reviews_topic_modeling_llm virtual environment
+conda create -n g2_reviews_topic_modeling_llm python=3.10
+# Activate the virtual environment
+conda activate g2_reviews_topic_modelling_llm
+```
+
+#### 3. Install the required dependencies: 
 
 ```
 pip install -r requirements.txt
