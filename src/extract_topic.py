@@ -17,36 +17,47 @@ from src.constants import OPENAI_KEY
 set_llm_cache(SQLiteCache(database_path=".langchain.db"))
 
 llm3 = ChatOpenAI(
-    temperature=0, 
+    temperature=0,
     openai_api_key=OPENAI_KEY,
-    model='gpt-3.5-turbo-1106',
+    model="gpt-3.5-turbo-1106",
     cache=True,
-    max_tokens=500
-
+    max_tokens=500,
 )
 
 llm4 = ChatOpenAI(
-    temperature=0, 
+    temperature=0,
     openai_api_key=OPENAI_KEY,
-    model='gpt-4-1106-preview',
+    model="gpt-4-1106-preview",
     cache=True,
-    max_tokens=500
-
+    max_tokens=500,
 )
 
 
 @st.cache_data(show_spinner=False)
-def summarize_cluster(texts, _llm):
+def summarize_cluster(_llm: ChatOpenAI, review_type_text: str, texts: list):
+    """
+    Generates a summary label for a cluster of customer reviews.
+
+    Args:
+        _llm (ChatOpenAI): The expert summarizer model.
+        review_type (str): The type of reviews to summarize ('Likes', 'Dislikes', or 'Use-case').
+        texts (list): A list of customer reviews.
+
+    Returns:
+        str: The generated summary label for the cluster of reviews.
+    """
     # Use a cheaper model for the map part
 
     summarize_one_prompt = textwrap.dedent(
-        '''
+        """
         You are an expert summarizer with the ability to find patterns in a set of customer reviews and summarize them into a single concise label.
         Provide a single short (3-10 words) label that encapsulate the key points the reviews have in common.
         The label(s) you provide should not be longer than a few words.
-        Ensure the label generated is not too vague (e.g. Do not include anything else.
+        Ensure the label generated is not too vague.
 
         The reviews are enclosed in triple backticks (```).
+
+        The reviews are describing {review_type_text}. If it seems like most of the reviews are not describing that, simply return "Uncategorized".
 
         ---
         EXAMPLE 1
@@ -76,67 +87,61 @@ def summarize_cluster(texts, _llm):
 
         REVIEWS:
         ```
-        {review_text}
+        {reviews_text}
         ```
 
         LABEL:
-        ''')
+        """
+    )
+
     prompt = ChatPromptTemplate.from_template(summarize_one_prompt)
-    stuffed_reviews_txt = '\n\n'.join([f'Review {i}: {txt}' for i, txt in enumerate(texts)])
+    stuffed_reviews_txt = "\n\n".join(
+        [f"Review {i}: {txt}" for i, txt in enumerate(texts)]
+    )
+    chain = prompt | _llm | StrOutputParser()
 
-    chain = prompt | llm3 | StrOutputParser()
-    
-    return chain.invoke({ "review_text": stuffed_reviews_txt })
-
-
-async def summarize_parallel(top_n_cluster, requests_per_minute=100):
-    semaphore = asyncio.Semaphore(requests_per_minute)  # Semaphore to limit concurrency
-
-    async def rate_limited_summarize_cluster(cluster_id, val):
-        async with semaphore:  # Acquire the semaphore
-            result = summarize_cluster(val['texts'], llm3)
-            await asyncio.sleep(60 / requests_per_minute)  # Rate limiting
-            return cluster_id, result
-        
-    tasks = [
-        rate_limited_summarize_cluster(cluster_id, val)
-        for cluster_id, val in top_n_cluster.items()
-        if cluster_id != -1
-    ]
-
-    results = await asyncio.gather(*tasks)
-
-    for cluster_id, result in results:
-        top_n_cluster[cluster_id]['cluster_label'] = result
-
-    top_n_cluster[-1]['cluster_label'] = 'Uncategorized'
-
-    return top_n_cluster
+    return chain.invoke(
+        {"reviews_text": stuffed_reviews_txt, "review_type_text": review_type_text}
+    )
 
 
-def summarize_sequential(top_n_cluster):
+def summarize_sequential(top_n_cluster, review_type):
     """
-    This function receives a list of documents and summarizes each document sequentially.
-    """
+    Generate a summary for each cluster in a top N cluster dictionary.
 
+    Parameters:
+        top_n_cluster (dict): A dictionary containing the top N clusters and their associated data.
+        review_type (str): The type of reviews to summarize ('Likes', 'Dislikes', or 'Use-case').
+
+    Returns:
+        dict: A dictionary containing the top N clusters with their associated data and cluster labels.
+    """
     # Creating a progress bar
     progress_bar = st.progress(0)
     progress_text = st.empty()
-    
+
+    if review_type == "Likes":
+        review_type_text = "only what the user likes about the product"
+    elif review_type == "Dislikes":
+        review_type_text = "only what the user dislikes about the product"
+    else:
+        review_type_text = "what the user's use-case is for the product"
+
     num_clusters = len(top_n_cluster)
     for i, (cluster_id, val) in enumerate(top_n_cluster.items()):
         if cluster_id == -1:
-            top_n_cluster[-1]['cluster_label'] = 'Uncategorized'
+            top_n_cluster[-1]["cluster_label"] = "Uncategorized"
         else:
-            top_n_cluster[cluster_id]['cluster_label'] = summarize_cluster(val['texts'], llm3)
-        
+            top_n_cluster[cluster_id]["cluster_label"] = summarize_cluster(
+                llm4, review_type_text, val["texts"]
+            )
+
         progress = (i + 1) / num_clusters
         progress_bar.progress(progress)
-        progress_text.text(f'Naming cluster {i + 1}/{num_clusters}')
+        progress_text.text(f"Naming cluster {i + 1}/{num_clusters}")
 
     # Ensure the progress bar is full upon completion
     progress_bar.empty()
     progress_text.empty()
-
 
     return top_n_cluster

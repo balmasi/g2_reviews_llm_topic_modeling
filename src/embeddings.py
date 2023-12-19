@@ -8,6 +8,7 @@ import streamlit as st
 from sentence_transformers import SentenceTransformer
 from sklearn.decomposition import PCA
 
+
 @st.cache_data(show_spinner=False)
 def get_pca_components_for_variance(embeddings, variance_threshold=0.8):
     """
@@ -24,11 +25,12 @@ def get_pca_components_for_variance(embeddings, variance_threshold=0.8):
     pca = PCA()
     pca.fit(embeddings)
     cumulative_variance = np.cumsum(pca.explained_variance_ratio_)
-    
+
     # Determine the number of components for the given variance threshold
     n_components = np.where(cumulative_variance >= variance_threshold)[0][0] + 1
-    print('Number of components derived from PCA:', n_components)
+    print("Number of components derived from PCA:", n_components)
     return n_components
+
 
 def generate_embeddings_free(txt_series):
     """
@@ -40,11 +42,11 @@ def generate_embeddings_free(txt_series):
     Returns:
         numpy.ndarray: An array of embeddings generated for the text series.
     """
-    embedder = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
-    na_filled = txt_series.fillna("", inplace=False) 
+    embedder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+    na_filled = txt_series.fillna("", inplace=False)
     # Generate embeddings for the text column
     return embedder.encode(na_filled.tolist())
-    
+
 
 @st.cache_data(show_spinner=False)
 def embed_reviews(df, column):
@@ -58,12 +60,15 @@ def embed_reviews(df, column):
     Returns:
     - df (DataFrame): The modified DataFrame with an additional column containing the embeddings.
     """
-    df[f'{column}_embeddings'] = pd.Series(list(generate_embeddings_free(df[column])))
-   
+    df[f"{column}_embeddings"] = pd.Series(list(generate_embeddings_free(df[column])))
+
     return df
 
+
 @st.cache_data(show_spinner=False)
-def reduce_dimensions_append_array(df, vector_col, num_dimensions=2, dim_col_name="dims"):
+def reduce_dimensions_append_array(
+    df, vector_col, num_dimensions=2, dim_col_name="dims"
+):
     """
     Reduces the dimensions of a DataFrame by applying UMAP algorithm to the specified vector column.
 
