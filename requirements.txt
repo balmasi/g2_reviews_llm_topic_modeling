@@ -3,7 +3,7 @@ python-dotenv==1.0.0
 spacy==3.7.2
 langchain==0.0.350
 openai==v0.28.1
-pandas==2.1.4
+pandas==2.0.3
 sentence-transformers==2.2.2
 umap-learn==0.5.5
 scikit-learn==1.3.2

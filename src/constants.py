@@ -11,4 +11,4 @@ if "OPENAI_KEY" not in os.environ:
     )
 
 OPENAI_KEY = os.environ["OPENAI_KEY"]
-APIFY_API_TOKEN = os.environ.get("APIFY_API_TOKEN", None)
+

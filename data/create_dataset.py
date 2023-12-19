@@ -1,8 +1,14 @@
 import json
 import os
-from apify_client import ApifyClient
+from os.path import join, dirname
 
-from src.constants import APIFY_API_TOKEN
+from apify_client import ApifyClient
+from dotenv import load_dotenv
+
+dotenv_path = join(dirname(__file__), "..", ".env")
+load_dotenv(dotenv_path)
+
+APIFY_API_TOKEN = os.environ.get("APIFY_API_TOKEN", None)
 
 
 if APIFY_API_TOKEN is None:

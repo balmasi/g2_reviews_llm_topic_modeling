@@ -28,7 +28,7 @@ The overall (processing) pipeline is as follows:
 
 #### 1. Clone the repository:
 ```bash
-   git clone https://github.com/balmasi/topic_modeling_llm
+   git clone https://github.com/balmasi/g2_reviews_llm_topic_modeling
 ```
 
 
