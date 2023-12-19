@@ -1,11 +1,13 @@
+import asyncio
 from src.extract_topic import summarize_parallel, summarize_sequential
 
 import streamlit as st
 import pandas as pd
+import numpy as np
 
 from src.preprocess import preprocess_data
 from src.text_utils import split_into_sentences
-from src.embeddings import embed_reviews, reduce_dimensions_append_x_y
+from src.embeddings import embed_reviews, get_pca_components_for_variance, reduce_dimensions_append_array
 from src.cluster import cluster_and_append, find_closest_to_centroid
 from src.visualize import visualize_embeddings, plot_over_time
 from src.ui import radio_filter, range_filter
@@ -64,14 +66,14 @@ with st.spinner('Parsing review sentences...'):
 with st.spinner('Vectorizing Reviews...'):
     embedded_df = embed_reviews(xpl_df, REVIEW_COL)
 
+
 # Filter to selected company
 company_df = base_df[base_df['product.slug'] == selected_company].merge(
     embedded_df, on='id'
 )
 
-
 with st.spinner('Clustering Reviews...'):
-    clustered_df = cluster_and_append(company_df, f'{REVIEW_COL}_embeddings')
+    clustered_df = cluster_and_append(company_df, f'{REVIEW_COL}_embeddings', n_components=50)
 
 N = 30
 
@@ -87,8 +89,8 @@ top_cluster_docs = summarize_sequential(top_cluster_docs)
 top_cluster_map = {cluster_id: data["cluster_label"] for cluster_id, data in top_cluster_docs.items()}
 clustered_df['cluster_label'] = clustered_df[f'{REVIEW_COL}_embeddings_cluster_id'].map(top_cluster_map)
 
-## Reduce the embedding space to 2D
-reduce_dim_df = reduce_dimensions_append_x_y(clustered_df, f'{REVIEW_COL}_embeddings')
+## Reduce the embedding space to 2D for visualization
+reduce_dim_df = reduce_dimensions_append_array(clustered_df, f'{REVIEW_COL}_embeddings', num_dimensions=2, dim_col_name='dims_2d')
 
 
 #### FILTERS
@@ -103,7 +105,7 @@ colour_by_col = {'Segment': 'segment', 'Source': 'source.type', 'Cluster': 'clus
 
 fig_clusters = visualize_embeddings(
     filtered_df,
-    x_col='x', y_col='y',
+    coords_col='dims_2d',
     review_text_column=REVIEW_COL,
     colour_by_column=colour_by_col
 )

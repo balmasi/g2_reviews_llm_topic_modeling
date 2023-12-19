@@ -8,7 +8,8 @@ def radio_filter(label, st, df, col):
     return df[df[col] == choice]
 
 def range_filter(label, st, df, col):
-    options = sorted(df[col].unique().tolist())
+    # Filter out None or NaN values and sort the unique values
+    options = sorted(df[col].dropna().unique().tolist())
     min_item = min(options)
     max_item = max(options)
 

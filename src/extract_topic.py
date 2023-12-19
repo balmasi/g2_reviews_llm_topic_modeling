@@ -89,23 +89,26 @@ def summarize_cluster(texts, _llm):
     return chain.invoke({ "review_text": stuffed_reviews_txt })
 
 
-@st.cache_resource
-async def summarize_parallel(top_n_cluster):
-    # Create a mapping from coroutine to cluster_id
-    coro_to_cluster_id = {
-        summarize_cluster(val['texts'], llm3): cluster_id
+async def summarize_parallel(top_n_cluster, requests_per_minute=100):
+    semaphore = asyncio.Semaphore(requests_per_minute)  # Semaphore to limit concurrency
+
+    async def rate_limited_summarize_cluster(cluster_id, val):
+        async with semaphore:  # Acquire the semaphore
+            result = summarize_cluster(val['texts'], llm3)
+            await asyncio.sleep(60 / requests_per_minute)  # Rate limiting
+            return cluster_id, result
+        
+    tasks = [
+        rate_limited_summarize_cluster(cluster_id, val)
         for cluster_id, val in top_n_cluster.items()
         if cluster_id != -1
-    }
-    coroutines = list(coro_to_cluster_id.keys())
+    ]
 
-    # Gather results from all coroutines
-    results = await asyncio.gather(*coroutines)
+    results = await asyncio.gather(*tasks)
 
-    # Pair each result with its corresponding cluster ID
-    for coro, result in zip(coroutines, results):
-        top_n_cluster[coro_to_cluster_id[coro]]['cluster_label'] = result
-    
+    for cluster_id, result in results:
+        top_n_cluster[cluster_id]['cluster_label'] = result
+
     top_n_cluster[-1]['cluster_label'] = 'Uncategorized'
 
     return top_n_cluster

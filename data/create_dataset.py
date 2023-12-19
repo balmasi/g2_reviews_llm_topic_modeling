@@ -1,13 +1,15 @@
+import json
 import os
 from apify_client import ApifyClient
-from os import environ
-import json
 
-if 'APIFY_API_TOKEN' not in environ:
-    raise KeyError('Please set the APIFY_API_TOKEN environment variable to your Apify API token before continuing. Find/create an API key at https://console.apify.com/account/integrations')
+from src.constants import APIFY_API_TOKEN
+
+
+if APIFY_API_TOKEN is None:
+    raise KeyError('Please set the APIFY_API_TOKEN value in your .env file before continuing. Find/create an API key at https://console.apify.com/account/integrations')
 
 # Initialize the ApifyClient with your API token
-client = ApifyClient(environ['APIFY_API_TOKEN'])
+client = ApifyClient(APIFY_API_TOKEN)
 
 # Function to read the entire content of the slugs file
 def read_slugs(file_path):

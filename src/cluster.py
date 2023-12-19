@@ -13,49 +13,39 @@ def cluster_column_embeddings(column_embeddings):
     
     return clusterer.labels_
 
-def cluster_column_embeddings_umap(column_embeddings):
-    # Reduce dimensions with UMAP
-    umap_model = umap.UMAP(n_components=10)
+def cluster_column_embeddings_umap(column_embeddings, n_components=None):
+    """
+    Generates a UMAP embedding for the given column embeddings and performs clustering using HDBSCAN.
+
+    Args:
+        column_embeddings (list): A list of column embeddings.
+        n_components (int, optional): The number of dimensions in the UMAP embedding. If not provided, it will be set to the length of column_embeddings.
+
+    Returns:
+        list: A list of cluster labels for each column embedding.
+    """
+    n_components = len(column_embeddings) if n_components is None else n_components
+    umap_model = umap.UMAP(n_components)
     umap_embeddings = umap_model.fit_transform(column_embeddings)
-    
-    # Initialize HDBSCAN with adjusted parameters
     clusterer = hdbscan.HDBSCAN(min_cluster_size=5, min_samples=3)
-    
-    # Fit the HDBSCAN clusterer on the UMAP-reduced data
     clusterer.fit(umap_embeddings)
-    
     return clusterer.labels_
 
-def cluster_column_embeddings_kmeans(column_embeddings, name=''):
-    # Using the elbow method to find the optimal number of clusters
-    wcss = []  # Within-cluster sum of squares
-    max_clusters = 10  # You might want to set this to a different maximum number of clusters
-
-    # Calculating the within-cluster sum of squares for different numbers of clusters
-    for i in range(1, max_clusters+1):
-        kmeans = KMeans(n_clusters=i, init='k-means++', max_iter=300, n_init=10, random_state=42)
-        kmeans.fit(column_embeddings)
-        wcss.append(kmeans.inertia_)  # inertia_ is the within-cluster sum-of-squares
-
-    # Plotting the results to visualize the 'elbow'
-    plt.figure(figsize=(10,5))
-    plt.plot(range(1, max_clusters+1), wcss, marker='o', linestyle='--')
-    plt.title(f'{name} Elbow Method For Optimal k')
-    plt.xlabel('Number of clusters')
-    plt.ylabel('WCSS')
-    plt.show()
-
-    # You need to choose the optimal number of clusters manually by looking at the plot
-    # Let's say you chose the number of clusters to be 'n', you'd then proceed with:
-    optimal_n = 4  # Replace with the number of clusters you've determined to be optimal
-    kmeans = KMeans(n_clusters=optimal_n, init='k-means++', max_iter=300, n_init=10, random_state=42)
-    kmeans.fit(column_embeddings)
-
-    return kmeans.labels_
 
 
 @st.cache_data(show_spinner=False)
-def cluster_and_append(df_original, embeddings_column):
+def cluster_and_append(df_original, embeddings_column, n_components=None):
+    """
+    A function that clusters the embeddings in a DataFrame and appends the cluster labels as a new column.
+
+    Parameters:
+    - df_original: The original DataFrame containing the embeddings.
+    - embeddings_column: The name of the column in the DataFrame that contains the embeddings.
+    - n_components: The number of dimensions to reduce the embeddings to using UMAP. If None, no reduction is performed.
+
+    Returns:
+    - df: A copy of the original DataFrame with an additional column containing the cluster labels.
+    """
     df = df_original.copy()
 
     # Convert lists of embeddings to a 2D NumPy array
@@ -68,7 +58,7 @@ def cluster_and_append(df_original, embeddings_column):
         embeddings_array = embeddings_array.reshape(-1, 1)
     
     # Get cluster labels
-    cluster_labels = cluster_column_embeddings_umap(embeddings_array)
+    cluster_labels = cluster_column_embeddings_umap(embeddings_array, n_components)
     
     # Create new column name for cluster labels
     new_column_name = f'{embeddings_column}_cluster_id'
@@ -79,6 +69,21 @@ def cluster_and_append(df_original, embeddings_column):
     return df  # Optional: Return the modified DataFrame
 
 def find_closest_to_centroid(df, top_N, embeddings_column, cluster_column, text_column):
+    """
+    Find the closest embeddings to the centroid of each cluster in a DataFrame.
+    
+    Args:
+        df (pd.DataFrame): The DataFrame containing the data.
+        top_N (int): The number of closest embeddings to find for each cluster.
+        embeddings_column (str): The name of the column containing the embeddings.
+        cluster_column (str): The name of the column containing the cluster IDs.
+        text_column (str): The name of the column containing the corresponding text.
+    
+    Returns:
+        dict: A dictionary where the keys are the cluster IDs and the values are dictionaries
+              with keys 'indices' and 'texts'. 'indices' contains the indices of the closest
+              embeddings to the centroid, and 'texts' contains the corresponding text.
+    """
     closest_data = {}
     unique_clusters = df[cluster_column].unique()
     for cluster_id in unique_clusters:

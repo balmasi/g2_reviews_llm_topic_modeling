@@ -5,16 +5,25 @@ import plotly.express as px
 
 
 
-def visualize_embeddings(df, x_col, y_col, review_text_column, colour_by_column):
+def visualize_embeddings(df, coords_col, review_text_column, colour_by_column):
+    # Ensure each entry in coords_col has exactly 2 elements
+    if any(len(coords) != 2 for coords in df[coords_col]):
+        raise ValueError(f"Each entry in '{coords_col}' must have exactly 2 elements (x and y coordinates)")
+
+    
+    # Create a temporary DataFrame for plotting
+    temp_df = df.copy()
+    temp_df[['x', 'y']] = temp_df[coords_col].to_list()
+
     # Create the interactive plot
     fig = px.scatter(
-        df,
-        x=x_col,
-        y=y_col,
+        temp_df,
+        x='x',
+        y='y',
         color=colour_by_column,
         hover_data={
-            x_col: False,  # hide the x-coordinate
-            y_col: False,  # hide the y-coordinate
+            'x': False,  # hide the x-coordinate
+            'y': False,  # hide the y-coordinate
             review_text_column: True  # display the hover_text
         }
     )
