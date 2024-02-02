@@ -1,8 +1,8 @@
 streamlit==1.29.0
 python-dotenv==1.0.0
 spacy==3.7.2
-langchain==0.0.350
-openai==v0.28.1
+langchain==0.1.5
+langchain-openai==0.0.5
 pandas==2.0.3
 sentence-transformers==2.2.2
 umap-learn==0.5.5

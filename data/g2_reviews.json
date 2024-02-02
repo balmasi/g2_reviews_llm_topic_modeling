@@ -12242,6 +12242,42 @@
         ]
     },
     {
+        "id": "9032645",
+        "url": "https://www.g2.com/products/board/reviews/9032645",
+        "product": {
+            "id": "991",
+            "slug": "board"
+        },
+        "name": "Carlo C.",
+        "type": "text",
+        "source": {
+            "review": "vendor_self",
+            "type": "vendor_self"
+        },
+        "helpful": 0,
+        "location": {
+            "country": "Italy",
+            "region": "Europe",
+            "primary": "EMEA"
+        },
+        "date": {
+            "submitted": "2023-12-19T03:50:28.708-06:00",
+            "published": "2023-12-19T10:05:05.144-06:00",
+            "updated": "2023-12-19T03:50:28.853-06:00"
+        },
+        "score": 5,
+        "segment": "mid-market",
+        "industry": "Apparel & Fashion",
+        "role": "Administrator",
+        "title": "tool for performance analysis and management",
+        "answers": [
+            "The ability to drill everywhere, to build your own reports and the possibility to read from several data sources",
+            "It's becoming expensive because of the rising fee",
+            null,
+            "Data and information available for a large number of users at the same time A.f.c"
+        ]
+    },
+    {
         "id": "6658875",
         "url": "https://www.g2.com/products/board/reviews/6658875",
         "product": {
@@ -12314,6 +12350,41 @@
         ]
     },
     {
+        "id": "9033057",
+        "url": "https://www.g2.com/products/board/reviews/9033057",
+        "product": {
+            "id": "991",
+            "slug": "board"
+        },
+        "name": "Massimiliano M.",
+        "type": "text",
+        "source": {
+            "review": "vendor_self",
+            "type": "vendor_self"
+        },
+        "helpful": 0,
+        "location": {
+            "country": "Italy",
+            "region": "Europe",
+            "primary": "EMEA"
+        },
+        "date": {
+            "submitted": "2023-12-19T05:16:49.285-06:00",
+            "published": "2023-12-19T10:05:06.490-06:00",
+            "updated": "2023-12-19T05:16:49.564-06:00"
+        },
+        "score": 4.5,
+        "segment": "mid-market",
+        "role": "Tech Writer",
+        "title": "Bi moltro user friendly",
+        "answers": [
+            "Pu\u00f2 essere utilizzato sia da utenti basic che per fare elaborazioni complesse",
+            "Difficolt\u00e0 nell'utilizzo su dispositivi mobili.",
+            null,
+            "Integrazione dei dati per il Budget, reportistica, analisi dei costi"
+        ]
+    },
+    {
         "id": "8977728",
         "url": "https://www.g2.com/products/board/reviews/8977728",
         "product": {
@@ -12347,6 +12418,42 @@
             "Nothing. Board is the tool we needed!!!!",
             null,
             "Reporting & budgetting in excel. More efficient month close & budgettingproces"
+        ]
+    },
+    {
+        "id": "7359826",
+        "url": "https://www.g2.com/products/board/reviews/7359826",
+        "product": {
+            "id": "991",
+            "slug": "board"
+        },
+        "name": "Verified User in Insurance",
+        "type": "text",
+        "source": {
+            "review": "vendor_self",
+            "type": "vendor_self"
+        },
+        "helpful": 0,
+        "location": {
+            "country": "Italy",
+            "region": "Europe",
+            "primary": "EMEA"
+        },
+        "date": {
+            "submitted": "2022-11-18T09:31:09.132-06:00",
+            "published": "2023-12-19T10:05:00.787-06:00",
+            "updated": "2023-12-19T09:43:34.702-06:00"
+        },
+        "score": 4.5,
+        "segment": "mid-market",
+        "industry": "Insurance",
+        "role": "User",
+        "title": "Flexible and dynamic in development, easy to use for end users",
+        "answers": [
+            "The possibility of quickly generating reports that meet different needs",
+            "the lack of \"exclude\" in layout selections",
+            null,
+            "We save time in report generation as we have the data from all management systems on Board; they are always up-to-date and aligned in every analysis we perform. They are also available to end users in real time."
         ]
     },
     {
@@ -12491,6 +12598,42 @@
             "Some features can be added like a sub total that can be used for computations or I haven't learned to do them yet on my end",
             null,
             "presentation of data"
+        ]
+    },
+    {
+        "id": "9033126",
+        "url": "https://www.g2.com/products/board/reviews/9033126",
+        "product": {
+            "id": "991",
+            "slug": "board"
+        },
+        "name": "Verified User in Business Supplies and Equipment",
+        "type": "text",
+        "source": {
+            "review": "vendor_self",
+            "type": "vendor_self"
+        },
+        "helpful": 0,
+        "location": {
+            "country": "Italy",
+            "region": "Europe",
+            "primary": "EMEA"
+        },
+        "date": {
+            "submitted": "2023-12-19T05:16:53.667-06:00",
+            "published": "2023-12-19T10:05:06.686-06:00",
+            "updated": "2023-12-19T05:16:53.798-06:00"
+        },
+        "score": 5,
+        "segment": "enterprise",
+        "industry": "Business Supplies and Equipment",
+        "role": "Administrator",
+        "title": "Collection and reporting at a glance",
+        "answers": [
+            "Flexibility and user freindly approach, with a powerful engine",
+            "difficulties in users definition management",
+            null,
+            "To have only one platform where the input from the subsidiaries worldwide are converging"
         ]
     },
     {
@@ -12990,42 +13133,6 @@
         "answers": [
             "ease of use and implementation of processes and reporting to support the corporate decision-making process",
             "in these years of use"
-        ]
-    },
-    {
-        "id": "7359826",
-        "url": "https://www.g2.com/products/board/reviews/7359826",
-        "product": {
-            "id": "991",
-            "slug": "board"
-        },
-        "name": "Verified User in Insurance",
-        "type": "text",
-        "source": {
-            "review": "vendor_self",
-            "type": "vendor_self"
-        },
-        "helpful": 0,
-        "location": {
-            "country": "Italy",
-            "region": "Europe",
-            "primary": "EMEA"
-        },
-        "date": {
-            "submitted": "2022-11-18T09:31:09.132-06:00",
-            "published": "2022-11-24T06:14:02.678-06:00",
-            "updated": "2022-11-22T02:48:37.583-06:00"
-        },
-        "score": 4.5,
-        "segment": "mid-market",
-        "industry": "Insurance",
-        "role": "User",
-        "title": "Flexible and dynamic in development, easy to use for end users",
-        "answers": [
-            "The possibility of quickly generating reports that meet different needs",
-            "Lack of flexibility in assigning visibility to user profiles",
-            null,
-            "We save time in report generation as we have the data from all management systems on Board; they are always up-to-date and aligned in every analysis we perform. They are also available to end users in real time."
         ]
     },
     {

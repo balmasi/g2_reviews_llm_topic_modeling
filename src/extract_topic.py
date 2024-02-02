@@ -3,12 +3,9 @@ import asyncio
 
 import streamlit as st
 
-from langchain.llms import OpenAI
-from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
-from langchain.globals import set_llm_cache
+from langchain_core.globals import set_llm_cache
 from langchain.cache import SQLiteCache
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema.output_parser import StrOutputParser
 
